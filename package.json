@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
+    "test": "tsx --test src/__tests__/*.test.ts",
     "postinstall": "playwright install chromium"
   },
   "dependencies": {
