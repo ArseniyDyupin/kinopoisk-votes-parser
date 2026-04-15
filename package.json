@@ -1,7 +1,7 @@
 {
-  "name": "kinopoisk-parser",
-  "version": "1.0.0",
-  "description": "Parse Kinopoisk user ratings into a JSON file",
+  "name": "kinopoisk-votes-parser",
+  "version": "1.1.0",
+  "description": "Export Kinopoisk user ratings to JSON, CSV or XML",
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",

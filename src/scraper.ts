@@ -46,26 +46,51 @@ async function selectMaxPerPage(page: Page): Promise<void> {
 
 export async function scrapePage(page: Page): Promise<Rating[]> {
   return page.evaluate(() => {
-    const ratings: { title: string; originalTitle: string; rating: number; ratedAt: string }[] = [];
+    const ratings: Rating[] = [];
     const items = document.querySelectorAll(".profileFilmsList > .item");
 
     for (const item of items) {
-      const nameRusEl = item.querySelector(".nameRus a");
+      const nameRusEl = item.querySelector(".nameRus a") as HTMLAnchorElement | null;
       const nameEngEl = item.querySelector(".nameEng");
       const dateEl = item.querySelector(".date");
       const voteEl = item.querySelector(".vote");
+      const ratingBold = item.querySelector(".rating b");
+      const ratingSpans = item.querySelectorAll(".rating span");
 
       const title = nameRusEl?.textContent?.trim() ?? "";
       const originalTitle = nameEngEl?.textContent?.trim() ?? "";
       const ratedAt = dateEl?.textContent?.trim() ?? "";
       const ratingStr = voteEl?.textContent?.trim() ?? "0";
 
+      const kpUrl = nameRusEl?.href ?? "";
+      const kpRating = ratingBold?.textContent?.trim() ?? "";
+
+      let votesCount = "";
+      let duration = "";
+
+      if (ratingSpans.length >= 1) {
+        const votesMatch = ratingSpans[0]?.textContent?.match(/^\((.+)\)$/);
+        if (votesMatch) votesCount = votesMatch[1].replace(/\s+/g, "");
+      }
+      if (ratingSpans.length >= 2) {
+        const durationMatch = ratingSpans[ratingSpans.length - 1]?.textContent?.match(/^(.+)\s*мин\.$/);
+        if (durationMatch) duration = durationMatch[1].trim();
+      }
+
+      const yearMatch = title.match(/\((?:(?:мини-)?сериал,\s*)?(\d{4})/);
+      const year = yearMatch?.[1] ?? "";
+
       if (title) {
         ratings.push({
           title,
           originalTitle,
+          year,
           rating: parseInt(ratingStr, 10) || 0,
           ratedAt,
+          kpRating,
+          votesCount,
+          duration,
+          kpUrl,
         });
       }
     }
